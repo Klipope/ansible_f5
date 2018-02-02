@@ -1,6 +1,15 @@
 # Collect all playbooks
-- include: onboarding.yml
-- include: operations.yml
-- include: http_iApp.yml
-- include: https_waf_iApp.yml
-- include: scp_iApp.yml
+#- import_playbook: onboarding.yml
+- import_playbook: operations.yml
+
+## iApp part:
+- import_playbook: iAppTemplate.yml
+  when: state == "present"
+
+- import_playbook: http_iApp.yml
+- import_playbook: https_waf_iApp.yml
+- import_playbook: scp_iApp.yml
+
+- import_playbook: iAppTemplate.yml
+  when: state == "absent"
+

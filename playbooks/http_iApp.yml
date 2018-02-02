@@ -15,7 +15,7 @@
 # - X-Forwarded-For header
 # - Default http monitor
 ---
-  - hosts: bigip
+  - hosts: "{{ target }}"
     gather_facts: False
     roles:
       - iAppService

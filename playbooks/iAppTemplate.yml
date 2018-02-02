@@ -1,6 +1,10 @@
 ---
-  - hosts: bigip
+  - hosts: "{{ target }}"
     gather_facts: False
     roles:
       - iAppTemplate 
+
+    vars:
+      - f5template: "appsvcs_integration_v2.0.004_waf"
+
 ...

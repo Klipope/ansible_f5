@@ -1,0 +1,78 @@
+- name: Deploy application on BIG-IQ
+  hosts: bigiq
+  gather_facts: false
+  vars:
+    username: "admin"
+    password: "admin"
+
+  tasks:
+
+  - name: get auth token 
+    uri:
+      url: https://{{ inventory_hostname }}/mgmt/shared/authn/login
+      method: POST
+      user: "{{ username }}"
+      password: "{{ password }}"
+      body: "{
+    		\"username\":\"{{username}}\",
+    		\"password\":\"{{password}}\",
+    		\"loginProviderName\": \"local\"
+        }"
+      force_basic_auth: yes
+      status_code: 200
+      body_format: json
+      validate_certs: no
+    register: auth
+    delegate_to: localhost
+
+#  - debug:  
+#      msg: "Output: {{auth}}"
+
+  - name: Create http profile cms_http_ssl_no
+    uri:
+      url: https://{{ inventory_hostname }}/mgmt/cm/adc-core/working-config/ltm/profile/http
+      method: POST
+      headers:
+        X-F5-Auth-Token: "{{auth.json.token.token}}"
+      body: "{
+		  \"headerInsert\": \"ssl: no\",
+		  \"isInsertXforwardedForEnabled\": true,
+		  \"partition\": \"Common\",
+		  \"name\": \"cms_http_ssl_no\"
+	}"
+      force_basic_auth: no
+      status_code: 200
+      body_format: json
+      validate_certs: no
+    register: resp
+    delegate_to: localhost
+ 
+  - debug:
+      msg: "ID: {{resp.json.id}}"
+
+  - name: Create http profile cms_http_ssl_yes
+    uri:
+      url: https://{{ inventory_hostname }}/mgmt/cm/adc-core/working-config/ltm/profile/http
+      method: POST
+      headers:
+        X-F5-Auth-Token: "{{auth.json.token.token}}"
+      body: "{
+                  \"headerInsert\": \"ssl: yes\",
+                  \"isInsertXforwardedForEnabled\": true,
+		  \"defaultsFromReference\": {
+		      \"id\": \"{{resp.json.id}}\",
+		      \"name\": \"cms_http_ssl_no\",
+		      \"partition\": \"Common\",
+		      \"link\": \"https://localhost/mgmt/cm/adc-core/working-config/ltm/profile/http/{{resp.json.id}}\"
+		  },
+                  \"partition\": \"Common\",
+                  \"name\": \"cms_http_ssl_yes\"
+        }"
+      force_basic_auth: no
+      status_code: 200
+      body_format: json
+      validate_certs: no
+    register: resp
+    delegate_to: localhost
+
+

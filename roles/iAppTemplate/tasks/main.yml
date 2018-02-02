@@ -1,9 +1,15 @@
 ---
-######################
-# Add/Remove objects #
-######################
+#############################
+# Add/Remove iApp templates #
+#############################
 
-- import_tasks: bigip_iapp_template/appsvcs.yml
-  vars:
-  - f5template: "appsvcs_integration_v2.0.004_waf"
+- name: Deploy iApp template {{ f5template }}.tmpl
+  bigip_iapp_template:
+    user: "{{username}}"
+    password: "{{password}}"
+    server: "{{ inventory_hostname }}"
+    content: "{{ lookup('file', '{{ f5template }}.tmpl') }}"
+    state: "{{ state }}"
+  delegate_to: localhost
+
 ...
