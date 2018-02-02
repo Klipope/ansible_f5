@@ -1,5 +1,5 @@
 #!/bin/bash
-TARGET="bigip-ha"
+TARGET="10.10.86.30"
 
 while test $# -gt 0; do
         case "$1" in
@@ -17,6 +17,7 @@ while test $# -gt 0; do
                         echo "--iwaf                    run the https_waf_iApp playbook"
                         echo "--iscp                    run the scp_iApp playbook"
                         echo "--ha                      run the ha_onboarding playbook"
+			echo "--tmsh 	                run the tmsh_example playbook"
                         exit 0
                         ;;
                 -n)
@@ -73,6 +74,10 @@ while test $# -gt 0; do
                         ;&
                 --clean)
                         ansible-playbook playbooks/all.yml --ask-vault-pass -e @password.yml -e target=$TARGET -e state="absent"
+                        shift
+                        ;;
+                --tmsh)
+                        ansible-playbook playbooks/tmsh_example.yml -e target=$TARGET
                         shift
                         ;;
 
