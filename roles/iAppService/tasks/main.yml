@@ -1,8 +1,18 @@
 ---
-######################
-# Add/Remove objects #
-######################
+##############################################
+# Add/Remove Application Service Deploaments #
+##############################################
 
-- import_tasks: bigip_iapp_service/appsvcs.yml
+- name: Configure a appsvcs iapp service using parameters in JSON document
+  bigip_iapp_service:
+    name: "{{app_name}}"
+    user: "{{ username }}"
+    password: "{{ password }}"
+    server: "{{ inventory_hostname }}"
+    template: "{{ f5template }}"
+    validate_certs: "false"
+    state: "{{ state }}"
+    parameters: "{{ lookup('template', '{{ j2template }}.j2') }}"
+  delegate_to: localhost
 
 ...

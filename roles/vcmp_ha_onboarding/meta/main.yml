@@ -1,6 +1,6 @@
 galaxy_info:
-  author: Thomas A. McGonagle
-  description: onboarding tasks to onboard a BigIP
+  author: Ralf Brunig
+  description: Onboarding of a vCMP guest on an existing vCMP host.
   company: F5 Networks
 
   # If the issue tracker for your role is not on github, uncomment the

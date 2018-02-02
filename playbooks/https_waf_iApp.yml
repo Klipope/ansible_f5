@@ -28,7 +28,7 @@
 
 
 ---
-  - hosts: bigip
+  - hosts: "{{ target }}"
     gather_facts: False
     roles:
       - iAppService

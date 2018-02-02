@@ -1,6 +1,6 @@
 galaxy_info:
-  author: Thomas A. McGonagle 
-  description: Operations role for operating a BigIP
+  author: Ralf Bruenig 
+  description: Service Deployments on BigIP
   company: F5 Networks
 
   # If the issue tracker for your role is not on github, uncomment the
