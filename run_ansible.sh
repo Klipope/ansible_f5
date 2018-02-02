@@ -11,7 +11,7 @@ while test $# -gt 0; do
                         echo "-n, --onboarding          run the onboarding playbook"
                         echo "-o, --operation           run the operation playbook"
                         echo "-t, --teardown            teardown the operation playbook"
-                        echo "--t-all, --clean          teardown all playbooks"
+                        echo "--t-all                   teardown all playbooks"
                         echo "--itemp                   run the iApptemplate playbook"
                         echo "--ihttp                   run the http_iApp playbook"
                         echo "--iwaf                    run the https_waf_iApp playbook"
@@ -72,8 +72,6 @@ while test $# -gt 0; do
                         shift
                         ;;
                 --t-all)
-                        ;&
-                --clean)
                         ansible-playbook playbooks/all.yml --ask-vault-pass -e @password.yml -e target=$TARGET -e state="absent"
                         shift
                         ;;

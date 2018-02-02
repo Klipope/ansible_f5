@@ -1,3 +1,4 @@
+---
 - name: BIG-IP GUI setup over tmsh 
   hosts: "{{ target }}"
   gather_facts: false
@@ -18,4 +19,4 @@
       - modify sys httpd auth-pam-idle-timeout {{ gui_idle_timeout }}
       - modify /sys db ui.system.preferences.recordsperscreen value {{ record_per_screen }}
     delegate_to: localhost
-    
+...    
