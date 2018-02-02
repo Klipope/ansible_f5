@@ -18,6 +18,7 @@ while test $# -gt 0; do
                         echo "--iscp                    run the scp_iApp playbook"
                         echo "--ha                      run the ha_onboarding playbook"
 			echo "--tmsh 	                run the tmsh_example playbook"
+                        echo "--rest                    run the rest_example playbook"
                         exit 0
                         ;;
                 -n)
@@ -78,6 +79,10 @@ while test $# -gt 0; do
                         ;;
                 --tmsh)
                         ansible-playbook playbooks/tmsh_example.yml -e target=$TARGET
+                        shift
+                        ;;
+                --rest)
+                        ansible-playbook playbooks/rest_example.yml -e target=$TARGET
                         shift
                         ;;
 

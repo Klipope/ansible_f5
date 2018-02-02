@@ -1,4 +1,4 @@
-- name: Deploy application on BIG-IQ
+- name: BIG-IP GUI setup over tmsh 
   hosts: "{{ target }}"
   gather_facts: false
   vars:
