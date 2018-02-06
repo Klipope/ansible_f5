@@ -1,7 +1,7 @@
 ---
-############
-#Add objects
-############
+#############
+#Add objects#
+#############
 - import_tasks: bigip_node/add_node.yml 
   vars: 
     - host: "10.10.10.209" 
@@ -43,9 +43,9 @@
     - all_rules: "OutOfService_Response"
   when: state == "present"
 
-###############
-#Remove objects
-###############
+################
+#Remove objects#
+################
 - import_tasks: bigip_virtual_server/manage_vip.yml
   vars:
     - description: "foo-vip" 
@@ -75,7 +75,7 @@
 
 - import_tasks: bigip_node/remove_node.yml 
   vars:
-    - name: "member20" 
-    - monitor: "/Common/icmp"
+    - host: "10.10.10.209"
+    - name: "member09" 
   when: state == "absent"
 ...
