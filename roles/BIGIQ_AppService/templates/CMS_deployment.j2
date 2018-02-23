@@ -1,0 +1,124 @@
+{# CMS deployment with http and https virtual
+
+vars:
+  - vip: <virtual server ip address>
+  - members:
+    -
+      ip: <pool member ip>
+      name: <node name>
+
+############################################################
+#}{
+    "resources": {
+        "ltm:virtual:f42014e6dbbd": [
+            {
+                "parameters": {
+                    "name": "{{ app_name }}_http_vs",
+                    "destinationAddress": "{{ vip }}",
+                    "mask": "255.255.255.255"
+                },
+                "parametersToRemove": [],
+                "subcollectionResources": {
+                    "profiles:43ce8df2147c": [
+                        {
+                            "parameters": {},
+                            "parametersToRemove": []
+                        }
+                    ],
+                    "profiles:ccf91f3f46c7": [
+                        {
+                            "parameters": {},
+                            "parametersToRemove": []
+                        }
+                    ]
+                }
+            }
+        ],
+        "ltm:virtual:5e0739c7f6bf": [
+            {
+                "parameters": {
+                    "name": "{{ app_name }}_https_vs",
+                    "destinationAddress": "{{ vip }}",
+                    "mask": "255.255.255.255"
+                },
+                "parametersToRemove": [],
+                "subcollectionResources": {
+                    "profiles:43ce8df2147c": [
+                        {
+                            "parameters": {},
+                            "parametersToRemove": []
+                        }
+                    ],
+                    "profiles:58803cb6130e": [
+                        {
+                            "parameters": {},
+                            "parametersToRemove": []
+                        }
+                    ],
+                    "profiles:c9b84b3596c5": [
+                        {
+                            "parameters": {},
+                            "parametersToRemove": []
+                        }
+                    ]
+                }
+            }
+        ],
+        "ltm:pool:6b3872e822ff": [
+            {
+                "parameters": {
+                    "name": "{{ app_name }}_pool",
+                    "loadBalancingMode": "least-connections-member",
+                    "ignorePersistedWeight": false
+                },
+                "parametersToRemove": [],
+                "subcollectionResources": {
+                    "members:584ab752ac7f": [
+                        {
+                            "parameters": {
+                                "nodeReference": {
+                                    "link": "#/resources/ltm:node:d01fa2b2991b/{{ app_name }}_node1",
+                                    "fullPath": "# {{ app_name }}_node1"
+                                }
+                            },
+                            "parametersToRemove": []
+                        },
+                        {
+                            "parameters": {
+                                "nodeReference": {
+                                    "link": "#/resources/ltm:node:d01fa2b2991b/{{ app_name }}_node2",
+                                    "fullPath": "# {{ app_name }}_node2"
+                                }
+                            },
+                            "parametersToRemove": []
+                        }
+                    ]
+                }
+            }
+        ],
+        "ltm:node:d01fa2b2991b": [
+{% for member in members %}
+            {
+                "parameters": {
+                    "name": "{{ app_name }}_{{ member.name }}",
+                    "address": "{{ member.ip }}"
+                },
+                "parametersToRemove": []
+  {% if loop.last %}
+            }
+  {% else%}
+            },
+  {% endif %}
+{% endfor %}
+        ]
+    },
+    "configSetName": "{{ app_name }}",
+    "prefix": "{{ app_name }}",
+    "defaultDeviceReference": {
+        "link": "https://localhost/mgmt/shared/resolver/device-groups/cm-adccore-allbigipDevices/devices/baf666f3-42a6-48ec-8091-cdfa5d677da1"
+    },
+    "templateReference": {
+        "link": "https://localhost/mgmt/cm/global/templates/c7da501f-5454-3eba-a787-960200d9efdb"
+    },
+    "mode": "CREATE"
+}
