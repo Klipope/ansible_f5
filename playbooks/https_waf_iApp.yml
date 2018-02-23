@@ -20,7 +20,7 @@
 # - Internal connection reuse
 # - port 80 redirect
 # - sorry page
-# - customisable http monitor
+# - customizable http monitor
 # 
 # WAF:
 # - Blacklisting for LAMP

@@ -1,56 +1,43 @@
-operations
-=========
-A role for operating an F5 BigIP device. Sets up nodes, pools, adds nodes to pools, vips, iRules and iApps.
+BIG-IQ Service Catalog deployment
+=================================
 
-Requirements
-------------
-f5-sdk
-bigsuds
-suds
-deepdiff
-requests
-netaddr
-parimkiko
+This is an example how to deploy a Service Catalog of BIG-IQ CM v5.4. The Service Catalog should be created manually over the BIG-IQ GUI. To get the related json code for the REST call, create an Application manually on the BIG-IQ and use the “View Sample API Request” button to create the related json file.
 
-Role Variables
---------------
-### bigip_node
-* host="10.0.2.167"
-* name="member1"
-* monitor="/Common/icmp"
+I stored this file in the template folder and modified it to a jinja2 template.
 
-### bigip_pool
-* name="pool1"
-* monitor="/Common/http_head_f5"
+Example playbook (BIGIQcms.yml):
+```
+##############################################
+# CMS deployment with http and https virtual #
+##############################################
+#
+#vars:
+#  - vip: <virtual server ip address>
+#  - members:
+#    -
+#      ip: <pool member ip>
+#      name: <node name>
+#
+---
+  - hosts: bigiq
+    gather_facts: False
+    roles:
+      - BIGIQ_AppService
+    vars:
+      - app_name: "cms2_demo"
+      - vip: "10.128.10.27"
+      - members:
+        -
+          ip: "10.10.10.221"
+          name: "node1"
+        -
+          ip: "10.10.10.222"
+          name: "node2"
 
-### bigip_pool_member
-* host="member1"
-* pool="pool1"
-* port="8080"
-
-### big_virtual_server
-* description="foo-vip"
-* destination="10.0.2.183"
-* name="foo-vip"
-* destination="10.0.2.183"
-* name="vip1"
-* pool="pool1"
-* port="80"
-* snat="Automap"
-* all_profiles="http"
-* all_rules="Bodgeit_Rewrite"
-
-Dependencies
-------------
-None
-
-Example Playbook
-----------------
-
-    - hosts: all
-      gather_facts: False
-      roles:
-        - operations
+## don't touch: ##
+      - j2template: "CMS_deployment"
+... 
+```
 
 License
 -------
@@ -58,4 +45,5 @@ Apache V2.0
 
 Author Information
 ------------------
-Thomas A. McGonagle (t.mcgonagle@f5.com)
+Ralf Bruenig (r.bruenig@f5.com)
+
