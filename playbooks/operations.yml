@@ -1,6 +1,16 @@
 ---
-  - hosts: "{{ target }}" 
-    gather_facts: False
-    roles:
-      - operations 
+- hosts: "{{ target }}"
+  gather_facts: False
+  roles:
+    - operations 
+
+  vars:
+    partition: "Common"
+    provider:
+      server: "{{ inventory_hostname }}"
+      server_port: "443"
+      user: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: "no"
+
 ...

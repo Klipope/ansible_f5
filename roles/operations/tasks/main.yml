@@ -4,8 +4,8 @@
 #############
 - import_tasks: bigip_node/add_node.yml 
   vars: 
-    - host: "10.10.10.209" 
-    - name: "member09" 
+    - host: "10.10.10.208" 
+    - name: "member08" 
     - monitor: "/Common/icmp"
   when: state == "present"
 
@@ -17,8 +17,8 @@
 
 - import_tasks: bigip_pool_member/manage_members.yml 
   vars: 
-    - host: "member09" 
-    - pool: "pool20"
+    - host: "/{{ partition }}/member08" 
+    - pool: "/{{ partition }}/pool20"
     - port: "80"
   when: state == "present"
 
@@ -36,11 +36,11 @@
     - description: "foo-vip" 
     - destination: "10.128.10.20" 
     - name: "vip20" 
-    - pool: "pool20" 
+    - pool: "/{{ partition }}/pool20" 
     - port: "80" 
     - snat: "Automap"
-    - all_profiles: "http"
-    - all_rules: "OutOfService_Response"
+    - all_profiles: "/Common/http"
+    - all_rules: "/{{ partition }}/OutOfService_Response"
   when: state == "present"
 
 ################
@@ -51,11 +51,11 @@
     - description: "foo-vip" 
     - destination: "10.128.10.20" 
     - name: "vip20" 
-    - pool: "pool20" 
+    - pool: "/{{ partition }}/pool20" 
     - port: "80" 
     - snat: "Automap"
-    - all_profiles: "http"
-    - all_rules: "Bodgeit_Rewrite"
+    - all_profiles: "/Common/http"
+    - all_rules: "/{{ partition }}//OutOfService_Response"
   when: state == "absent"
 
 - import_tasks: bigip_irule/manage_irule.yml
@@ -75,7 +75,7 @@
 
 - import_tasks: bigip_node/remove_node.yml 
   vars:
-    - host: "10.10.10.209"
-    - name: "member09" 
+    - host: "10.10.10.208"
+    - name: "member08" 
   when: state == "absent"
 ...

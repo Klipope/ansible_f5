@@ -1,11 +1,9 @@
 ---
 - name: Manage a pool
   bigip_pool:
-    server: "{{ inventory_hostname }}"
-    user: "{{ username }}"
-    password: "{{ password }}"
     name: "{{ name }}"
-    validate_certs: "false"
+    partition: "{{ partition }}"
+    provider: "{{ provider }}"
     state: "{{ state }}"
     monitors:
       - "{{ monitor }}"

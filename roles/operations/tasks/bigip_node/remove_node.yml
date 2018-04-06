@@ -1,11 +1,9 @@
 ---
 - name: Remove a new node
   bigip_node:
-    server: "{{ inventory_hostname }}"
-    user: "{{ username }}"
-    password: "{{ password }}"
     name: "{{ name }}"
-    validate_certs: "false"
+    partition: "{{ partition }}"
+    provider: "{{ provider }}"
     state: "{{ state }}"
   delegate_to: localhost
 ...

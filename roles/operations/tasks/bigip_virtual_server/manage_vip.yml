@@ -1,9 +1,6 @@
 ---
 - name: Manage a VIP
   bigip_virtual_server:
-    server: "{{ inventory_hostname }}"
-    user: "{{ username }}"
-    password: "{{ password }}"
     description: "{{ description }}"
     destination: "{{ destination }}"
     name: "{{ name }}"
@@ -14,7 +11,8 @@
       - "{{ all_profiles }}"
     all_rules:
       - "{{ all_rules }}"
-    validate_certs: "false"
+    partition: "{{ partition }}"
+    provider: "{{ provider }}"
     state: "{{ state }}"
   delegate_to: localhost
 ...
