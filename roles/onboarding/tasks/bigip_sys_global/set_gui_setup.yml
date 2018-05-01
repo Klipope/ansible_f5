@@ -1,9 +1,7 @@
 ---
 - name: Disable the setup utility
   bigip_sys_global:
-    user: "{{ username }}"
-    password: "{{ password }}"
-    server: "{{ inventory_hostname }}"
     gui_setup: "disabled"
+    provider: "{{ provider }}"
   delegate_to: localhost
 ...

@@ -1,10 +1,7 @@
 ---
 - name: License BIG-IP using default license options
   bigip_license:
-    user: "{{ username }}"
-    password: "{{ password }}"
-    server: "{{ inventory_hostname }}"
     key: "{{ key }}"
-    validate_certs: "no"
+    provider: "{{ provider }}"
   delegate_to: localhost
 ...

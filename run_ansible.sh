@@ -24,7 +24,7 @@ while test $# -gt 0; do
                 -n)
                         ;&
                 --onboarding)
-                        ansible-playbook playbooks/onboarding.yml --ask-vault-pass -e @password.yml -vvv 
+                        ansible-playbook playbooks/onboarding.yml --ask-vault-pass -e @password.yml  -e target=$TARGET  
                         shift
                         ;;
                 -o)
