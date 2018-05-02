@@ -1,0 +1,87 @@
+---
+
+# floating self IPs:
+- import_tasks: bigip_selfip/add_selfip.yml
+  vars:
+    - name: "ext_self_floating_v4"
+    - address: "{{ ext_floating_self_ip }}"
+    - netmask: "{{ ext_netmask }}"
+    - vlan_name: "{{ ext_vlan_name }}"
+    - route_domain: "0"
+    - traffic_group: "traffic-group-1"
+  when: inventory_hostname == {{ ansible_play_batch[0] }} 
+
+- import_tasks: bigip_selfip/add_selfip.yml
+  vars:
+    - name: "int_self_floating_v4"
+    - address: "{{ int_floating_self_ip }}"
+    - netmask: "{{ int_netmask }}"
+    - vlan_name: "{{ int_vlan_name }}"
+    - route_domain: "0"
+    - traffic_group: "traffic-group-1"
+  when: inventory_hostname == {{ ansible_play_batch[0] }}
+
+
+##########
+# HA Setup
+
+# This is needed for vcmp guests, since the device name is by default bigip1 and not the hostname.
+- import_tasks: bigip_command/modify_device_name.yml
+
+## Check, if one system need to be restored. If so, remove trust on remaining devices.
+#- import_tasks: bigip_command/reset_trust_if_needed.yml
+
+- import_tasks: bigip_command/set_configsync_address.yml
+  vars:
+    - address: "{{ int_self_ip }}"
+
+- import_tasks: bigip_command/set_heartbeat_address.yml
+  vars:
+    - address: "{{ ha_self_ip }}"
+    - mgmt_address: "{{ mgmt_ip }}"
+
+- import_tasks: bigip_command/set_mirroring_address.yml
+  vars:
+    - address: "{{ int_self_ip }}"
+
+- import_tasks: bigip_command/set_device_trust.yml
+
+- import_tasks: bigip_command/create_device_group.yml
+
+## Sync config to peer, if the peer needs to be recovered
+- import_tasks: ping.yml
+  vars:
+    - address: "{{ int_self_ip }}"
+- import_tasks: bigip_command/initial_config_sync_after_rebuild.yml
+  when: peer_recovered is defined and peer_recovered.changed
+- import_tasks: bigip_command/initial_config_sync_after_rebuild.yml
+  when: peer_recovered is defined and peer_recovered.changed
+  vars:
+    - device_group_name: "datasync-global-dg"
+- import_tasks: bigip_command/check_sync_status.yml
+  when: peer_recovered is defined and peer_recovered.changed
+
+# debug:
+#- name: Result output
+#  debug:
+#    msg:
+#      - changed: "{{ peer_recovered.changed }}"
+#  when: peer_recovered is defined
+
+
+# Sync if devices are not in sync and peer was not recovered
+- import_tasks: bigip_command/initial_config_sync_if_needed.yml
+  when: peer_recovered is not defined or ( peer_recovered is defined and not peer_recovered.changed )
+- import_tasks: bigip_command/initial_config_sync_if_needed.yml
+  vars:
+    - device_group_name: "datasync-global-dg"
+  when: peer_recovered is not defined or ( peer_recovered is defined and not peer_recovered.changed )
+
+# Final check of the ha status
+- import_tasks: bigip_command/check_sync_status.yml
+- import_tasks: bigip_command/check_ha_status.yml
+
+# HA setup - end
+################
+
+...

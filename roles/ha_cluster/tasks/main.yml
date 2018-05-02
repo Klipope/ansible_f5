@@ -1,0 +1,60 @@
+---
+
+# floating self IPs:
+- name: Add HA Self-IPs
+  bigip_selfip:
+    name: "{{ item.name }}"
+    address: "{{ item.address }}"
+    netmask: "{{ item.netmask }}"
+    vlan: "{{ item.vlan }}"
+    traffic_group: "{{ item.traffic_group }}"
+    provider: "{{ provider }}"
+  loop: "{{ floating_self_ips }}"
+  when: inventory_hostname == ansible_play_hosts[0]
+  delegate_to: localhost
+
+##########
+# HA Setup
+
+# This is needed for vcmp guests, since the device name is by default bigip1 and not the hostname.
+- import_tasks: bigip_command/modify_device_name.yml
+
+## Check, if one system need to be restored. If so, remove trust on remaining devices.
+#- import_tasks: bigip_command/reset_trust_if_needed.yml
+
+- name: Set CMI device parameters
+  bigip_device_connectivity:
+    config_sync_ip: "{{ config_sync_ip }}"
+    mirror_primary_address: "{{ mirror_primary_address }}"
+    unicast_failover: "{{ unicast_failover }}"
+    provider: "{{ provider }}"
+  delegate_to: localhost
+
+- import_tasks: bigip_device/set_device_trust.yml
+
+- name: Add Device Group
+  bigip_device_group:
+    name: "{{ device_group_name }}"
+    auto_sync: no
+    type: sync-failover
+    provider: "{{ provider }}"
+  when: inventory_hostname == ansible_play_hosts[0]
+  delegate_to: localhost
+
+- name: Add members to the device group
+  bigip_device_group_member:
+    device_group: "{{ device_group_name }}"
+    name: "{{ hostvars[item].hostname }}"
+    provider: "{{ provider }}"
+  loop: "{{ ansible_play_hosts }}"
+  when: inventory_hostname == ansible_play_hosts[0]
+  delegate_to: localhost
+
+- name: Perform a config sync
+  bigip_configsync_action:
+    device_group: "{{ device_group_name }}"
+    sync_device_to_group: yes
+    provider: "{{ provider }}"
+  when: inventory_hostname == ansible_play_hosts[0]
+  delegate_to: localhost
+...

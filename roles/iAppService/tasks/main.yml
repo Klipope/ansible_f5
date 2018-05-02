@@ -6,13 +6,10 @@
 - name: Configure a appsvcs iapp service using parameters in JSON document
   bigip_iapp_service:
     name: "{{app_name}}"
-    user: "{{ username }}"
-    password: "{{ password }}"
-    server: "{{ inventory_hostname }}"
+    partition: "{{ partition }}"
     template: "{{ f5template }}"
-    validate_certs: "false"
     state: "{{ state }}"
     parameters: "{{ lookup('template', '{{ j2template }}.j2') }}"
+    provider: "{{ provider }}"
   delegate_to: localhost
-
 ...

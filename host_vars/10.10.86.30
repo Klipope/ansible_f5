@@ -1,6 +1,6 @@
 ---
 mgmt_ip: 10.10.86.30
-hostname: "bigip-ha-a.demo.local"
+hostname: "bigip_a.demo.local"
 
 self_ips:
   - name: ext_self_v4
@@ -16,7 +16,12 @@ self_ips:
     netmask: 255.255.255.0
     vlan: ha
 
-peer_host: "10.10.86.31"
-peer_hostname: "bigip-ha-b.demo.local"
+# HA setup
+config_sync_ip: "{{ self_ips[0].address }}"
+mirror_primary_address: "{{ self_ips[0].address }}"
+unicast_failover:
+  - address: "{{ self_ips[2].address }}"
+  - address: "{{ mgmt_ip }}"
+
 
 ...

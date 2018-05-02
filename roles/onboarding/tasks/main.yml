@@ -4,6 +4,12 @@
 #  vars:
 #    - key: "{{ license_key }}"
 
+- name: Create partitions using the default route domain
+  bigip_partition:
+    name: "{{ item }}"
+    provider: "{{ provider }}"
+  loop: "{{ partitions }}"
+  delegate_to: localhost
 
 - name: Add VLANs
   bigip_vlan:
@@ -48,21 +54,21 @@
     - search_domain1: "localdomain"
     - search_domain2: "lab.local" 
 
-#- import_tasks: bigip_user/add_user.yml 
-#  vars:
-#    - username_credential: "ralf" 
-#    - password_credential: "{{ ralf_password }}" 
-#    - full_name: "ralf Bruenig" 
-#    - partition_access: "all:admin" 
-#    - update_password: "on_create"
+- import_tasks: bigip_user/add_user.yml 
+  vars:
+    - username_credential: "ralf" 
+    - password_credential: "{{ ralf_password }}" 
+    - full_name: "ralf Bruenig" 
+    - partition_access: "all:admin" 
+    - update_password: "on_create"
 
-#- import_tasks: bigip_user/add_user.yml 
-#  vars: 
-#    - username_credential: "bob" 
-#    - password_credential: "{{ bob_password }}" 
-#    - full_name: "Bob Bob" 
-#    - partition_access: "Common:operator" 
-#    - update_password: "on_create"
+- import_tasks: bigip_user/add_user.yml 
+  vars: 
+    - username_credential: "bob" 
+    - password_credential: "{{ bob_password }}" 
+    - full_name: "Bob Bob" 
+    - partition_access: "Common:operator" 
+    - update_password: "on_create"
 
 #- import_tasks: bigip_provision/provision_module.yml module="asm" level="nominal"
 #- import_tasks: bigip_provision/provision_module.yml module="afm" level="nominal"
@@ -79,5 +85,7 @@
     - records_per_screen: 100
 
 - import_tasks: bigip_sys_global/set_gui_setup.yml
+
+
 
 ...

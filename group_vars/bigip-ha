@@ -1,5 +1,11 @@
 ---
-master: "10.10.86.30"
+#master: "10.10.86.30"
+
+partitions:
+  - part1
+  - part2
+  - part3
+  - demo
 
 vlans:
   - name: external
@@ -21,9 +27,17 @@ vlans:
       untagged:
         - 1.3
 
+floating_self_ips:
+  - name: ext_floating_self_v4
+    address: 10.128.10.32
+    netmask: 255.255.255.0
+    vlan: external
+    traffic_group: "/Common/traffic-group-1"
+  - name: int_floating_self_v4
+    address: 10.10.10.32
+    netmask: 255.255.255.0
+    vlan: internal
+    traffic_group: "/Common/traffic-group-1"
 
-
-ext_floating_self_ip: "10.128.10.32"
-int_floating_self_ip: "10.10.10.32"
 device_group_name: "main_dg"
 ...
