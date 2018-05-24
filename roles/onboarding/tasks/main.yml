@@ -46,13 +46,13 @@
   vars:
     - timezone: "Europe/Berlin"
 
-# Issue dhcp needs to be disabled - https://github.com/mcgonagle/ansible_f5/issues/10
-- import_tasks: bigip_device_dns/set_dns.yml
-  vars:
-    - name_server1: "10.128.10.2"
-    - name_server2: "8.8.4.4"
-    - search_domain1: "localdomain"
-    - search_domain2: "lab.local" 
+- name: Set the DNS settings
+  bigip_device_dns:
+    name_servers: "{{ name_server_list }}"
+    search: "{{ search_domain_list }}"
+    ip_version: "4"
+    provider: "{{ provider }}"
+  delegate_to: localhost
 
 - import_tasks: bigip_user/add_user.yml 
   vars:
