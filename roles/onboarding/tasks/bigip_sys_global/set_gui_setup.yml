@@ -1,7 +1,7 @@
 ---
 - name: Disable the setup utility
   bigip_sys_global:
-    gui_setup: "disabled"
+    gui_setup: "false"
     provider: "{{ provider }}"
   delegate_to: localhost
 ...
