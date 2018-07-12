@@ -1,8 +1,0 @@
----
-- name: Provision Module(s)
-  bigip_provision:
-    module: "{{ module }}"
-    level: "{{ level }}"
-    provider: "{{ provider }}"
-  delegate_to: localhost
-...

@@ -4,21 +4,33 @@ hostname: "bigip_b.demo.local"
 
 self_ips:
   - name: ext_self_v4
-    address: 10.128.10.31
-    netmask: 255.255.255.0
-    vlan: external
+    partition: "extDMZ"
+    address: "10.128.10.31"
+    netmask: "255.255.255.0"
+    vlan: "/extDMZ/external"
+    route_domain: 1
   - name: int_self_v4
-    address: 10.10.10.31
-    netmask: 255.255.255.0
-    vlan: internal
+    partition: "extDMZ"
+    address: "10.10.10.31"
+    netmask: "255.255.255.0"
+    vlan: "/extDMZ/internal"
+    route_domain: 1
   - name: ha_self_v4
-    address: 1.1.1.31
-    netmask: 255.255.255.0
-    vlan: ha
+    partition: "Common"
+    address: "1.1.1.31"
+    netmask: "255.255.255.0"
+    vlan: "ha"
+    route_domain: 0
+  - name: sy_self_v4
+    partition: "Common"
+    address: "10.1.1.31"
+    netmask: "255.255.255.0"
+    vlan: "sy"
+    route_domain: 0
 
 # HA setup
-config_sync_ip: "{{ self_ips[0].address }}"
-mirror_primary_address: "{{ self_ips[0].address }}"
+config_sync_ip: "{{ self_ips[3].address }}"
+mirror_primary_address: "{{ self_ips[3].address }}"
 unicast_failover:
   - address: "{{ self_ips[2].address }}"
   - address: "{{ mgmt_ip }}"

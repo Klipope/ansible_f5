@@ -1,0 +1,11 @@
+- name: Add trunks
+  bigip_trunk:
+    name: "{{ item.name }}"
+    interfaces: "{{ item.interfaces }}"
+    lacp_enabled: "{{ item.lacp_enabled }}"
+    lacp_mode: "{{ item.lacp_mode }}"
+    lacp_timeout: "{{ item.lacp_timeout }}"
+    provider: "{{ provider }}"
+#  loop: "{{ trunks }}"
+  delegate_to: localhost
+

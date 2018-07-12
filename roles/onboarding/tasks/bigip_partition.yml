@@ -1,0 +1,9 @@
+
+- name: Create partitions using the default route domain
+  bigip_partition:
+    name: "{{ item.name }}"
+    provider: "{{ provider }}"
+  loop: "{{ partitions }}"
+  delegate_to: localhost
+
+

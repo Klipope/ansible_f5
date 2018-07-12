@@ -4,32 +4,63 @@
 #  vars:
 #    - key: "{{ license_key }}"
 
-- name: Create partitions using the default route domain
-  bigip_partition:
-    name: "{{ item }}"
-    provider: "{{ provider }}"
-  loop: "{{ partitions }}"
-  delegate_to: localhost
+- include_tasks: bigip_partition.yml
+  when: partitions is defined
 
-- name: Add VLANs
+- include_tasks: bigip_trunk.yml
+  when: trunk is defined
+
+########################################
+## vlan
+## Unfortunately, it is not possible in ansible to use tagged and untagged interfaces mixed, that's why I split it here
+- name: Add VLANs with untagged interfaces
   bigip_vlan:
     name: "{{ item.name }}"
     tag: "{{ item.tag }}"
     #tagged_interfaces: "{{ item.interfaces.tagged }}"
     untagged_interfaces: "{{ item.interfaces.untagged }}"
+    partition: "{{ item.partition }}"
     provider: "{{ provider }}"
   loop: "{{ vlans }}"
+  when: item.interfaces.untagged[0] is defined
   delegate_to: localhost
 
-- name: Add HA Self-IPs
+- name: Add VLANs with tagged interfaces
+  bigip_vlan:
+    name: "{{ item.name }}"
+    tag: "{{ item.tag }}"
+    tagged_interfaces: "{{ item.interfaces.tagged }}"
+    #untagged_interfaces: "{{ item.interfaces.untagged }}"
+    partition: "{{ item.partition }}"
+    provider: "{{ provider }}"
+  loop: "{{ vlans }}"
+  when: item.interfaces.tagged[0] is defined
+  delegate_to: localhost
+
+- include_tasks: bigip_routedomain.yml
+  when: routedomains is defined
+
+- include_tasks: bigip_partition_rd-update.yml
+  when: routedomains is defined and partitions is defined
+
+
+- name: Add non-floating Self-IPs
   bigip_selfip:
     name: "{{ item.name }}"
     address: "{{ item.address }}"
     netmask: "{{ item.netmask }}"
     vlan: "{{ item.vlan }}"
+    partition: "{{ item.partition }}"
+    route_domain: "{{ item.route_domain }}"
     provider: "{{ provider }}"
   loop: "{{ self_ips }}"
   delegate_to: localhost
+
+- include_tasks: bigip_static_route.yml
+  when: routes is defined
+
+##############################################
+## system settings
 
 - name: Configure hostname
   bigip_hostname:
@@ -70,21 +101,29 @@
     - partition_access: "Common:operator" 
     - update_password: "on_create"
 
-#- import_tasks: bigip_provision/provision_module.yml module="asm" level="nominal"
-#- import_tasks: bigip_provision/provision_module.yml module="afm" level="nominal"
-#- import_tasks: bigip_provision/provision_module.yml module="avr" level="nominal"
 
 #- import_tasks: bigip_ssl_certificate/import_certificate.yml
 
-- import_tasks: bigip_command/set_gui_idle-timeout.yml
-  vars:
-    - gui_idle_timeout: 7200
+- name: Set the GUI auth idle timeout to {{ gui_idle_timeout }} seconds
+  bigip_device_httpd:
+    auth_pam_idle_timeout: "{{ gui_idle_timeout }}"
+    provider: "{{ provider }}"
+  delegate_to: localhost
 
 - import_tasks: bigip_sys_db/set_records-per-screen.yml
   vars:
     - records_per_screen: 100
 
 - import_tasks: bigip_sys_global/set_gui_setup.yml
+
+- name: Provision Modules
+  bigip_provision:
+    module: "{{ item.module }}"
+    state: "{{ item.state }}"
+    level: "{{ item.level }}"
+    provider: "{{ provider }}"
+  loop: "{{ provisioning }}"
+  delegate_to: localhost
 
 
 

@@ -1,0 +1,11 @@
+- name: Create route domains
+  bigip_routedomain:
+    name: "{{ item.name }}"
+    id: "{{ item.id }}"
+    vlans: "{{ item.vlans }}"
+    partition: "{{ item.partition }}"
+    provider: "{{ provider }}"
+  loop: "{{ routedomains }}"
+  delegate_to: localhost
+
+

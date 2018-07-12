@@ -1,2 +1,12 @@
 ---
+
+gui_idle_timeout: 2400
+
+name_server_list:
+  - "10.128.10.2"
+  - "9.9.9.9"
+search_domain_list:
+  - "localdomain"
+  - "lab.local"
+
 ...

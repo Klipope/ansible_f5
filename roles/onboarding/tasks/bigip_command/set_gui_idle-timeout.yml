@@ -1,7 +1,0 @@
----
-- name: set GUI idle timeout to {{ gui_idle_timeout }}
-  bigip_command:
-    commands: modify sys httpd auth-pam-idle-timeout {{ gui_idle_timeout }}
-    provider: "{{ provider }}"
-  delegate_to: localhost
-...

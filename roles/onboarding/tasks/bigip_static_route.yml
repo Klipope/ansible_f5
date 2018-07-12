@@ -1,0 +1,13 @@
+- name: Create static route entries
+  bigip_static_route:
+    name: "{{ item.name }}"
+    destination: "{{ item.destination }}"
+    netmask: "{{ item.netmask }}"
+    gateway_address: "{{ item.gateway }}"
+    route_domain: "{{ item.route_domain }}"
+    partition: "{{ item.partition }}"
+    provider: "{{ provider }}"
+  loop: "{{ routes }}"
+  delegate_to: localhost
+
+

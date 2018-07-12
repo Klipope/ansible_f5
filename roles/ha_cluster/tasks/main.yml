@@ -1,12 +1,14 @@
 ---
 
 # floating self IPs:
-- name: Add HA Self-IPs
+- name: Add floating Self-IPs
   bigip_selfip:
     name: "{{ item.name }}"
     address: "{{ item.address }}"
     netmask: "{{ item.netmask }}"
     vlan: "{{ item.vlan }}"
+    partition: "{{ item.partition }}"
+    route_domain: "{{ item.route_domain }}"
     traffic_group: "{{ item.traffic_group }}"
     provider: "{{ provider }}"
   loop: "{{ floating_self_ips }}"
