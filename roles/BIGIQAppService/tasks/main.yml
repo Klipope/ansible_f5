@@ -1,0 +1,183 @@
+---
+##############################################
+# Add/Remove Application Service over BIG-IQ #
+##############################################
+
+- name: get auth token
+  uri:
+    url: https://{{ inventory_hostname }}/mgmt/shared/authn/login
+    method: POST
+    user: "{{ username }}"
+    password: "{{ password }}"
+    body: "{
+              \"username\":\"{{username}}\",
+              \"password\":\"{{password}}\",
+              \"loginProviderName\": \"local\"
+      }"
+    force_basic_auth: yes
+    status_code: 200
+    body_format: json
+    validate_certs: no
+  register: auth
+  delegate_to: localhost
+
+
+
+# Add or update Application Service
+###################################
+
+- name: "Check if Application {{ app_name }} exists."
+  uri:
+    url: "https://{{ inventory_hostname }}/mgmt/cm/global/config-sets?$filter=configSetName%20eq%20'{{ app_name }}'"
+    method: GET 
+    headers:
+      X-F5-Auth-Token: "{{auth.json.token.token}}"
+    force_basic_auth: no
+    status_code: 200
+    body_format: json
+    validate_certs: no
+  register: appList
+  delegate_to: localhost
+  when: state == "present"
+
+- set_fact:
+    mode: "CREATE"
+  when: (state == "present") and (appList.json.totalItems == 0)
+
+- set_fact:
+    mode: "UPDATE"
+  when: (state == "present") and (appList.json.totalItems > 0)
+
+- debug:
+    msg: "Mode is {{ mode }}"
+  when: (state == "present")
+
+- name: "Get UUID of {{ device_name }}."
+  uri:
+    url: "https://{{ inventory_hostname }}/mgmt/shared/resolver/device-groups/cm-bigip-allBigIpDevices/devices?$filter=hostname%20eq%20'{{ device_name }}'"
+    method: GET
+    headers:
+      X-F5-Auth-Token: "{{auth.json.token.token}}"
+    force_basic_auth: no
+    status_code: 200
+    body_format: json
+    validate_certs: no
+  register: deviceList
+  delegate_to: localhost
+  when: (state == "present") and (mode == "CREATE")
+
+- debug:
+    msg: "UUID of {{ device_name }} is {{ deviceList.json['items'][0].machineId }}"
+  when: (state == "present") and (mode == "CREATE")
+
+- set_fact:
+    defaultDeviceReference: "\"defaultDeviceReference\": { \"link\": \"https://localhost/mgmt/shared/resolver/device-groups/cm-adccore-allbigipDevices/devices/{{ deviceList.json['items'][0].machineId }}\" },"
+  when: (state == "present") and (mode == "CREATE")
+
+- set_fact:
+    defaultDeviceReference: ""
+  when: (state == "present") and (mode != "CREATE")
+
+
+- name: "Get UUID of {{ template_name }}."
+  uri:
+    url: "https://{{ inventory_hostname }}/mgmt/cm/global/templates?$filter=name%20eq%20'{{ template_name }}'"
+    method: GET
+    headers:
+      X-F5-Auth-Token: "{{auth.json.token.token}}"
+    force_basic_auth: no
+    status_code: 200
+    body_format: json
+    validate_certs: no
+  register: templateList
+  delegate_to: localhost
+  when: state == "present"
+
+- debug:
+    msg: "UUID of {{ template_name }} is {{ templateList.json['items'][0].id }}"
+  when: state == "present"
+
+- set_fact:
+    template_uuid: "{{ templateList.json['items'][0].id }}"
+  when: state == "present"
+
+
+- name: "Get UUID of {{ certificate }}.key."
+  uri:
+    url: "https://{{ inventory_hostname }}/mgmt/cm/adc-core/working-config/sys/file/ssl-key?$filter=name%20eq%20'{{ certificate }}.key'"
+    method: GET
+    headers:
+      X-F5-Auth-Token: "{{auth.json.token.token}}"
+    force_basic_auth: no
+    status_code: 200
+    body_format: json
+    validate_certs: no
+  register: keyList
+  delegate_to: localhost
+  when: state == "present"
+
+- debug:
+    msg: "UUID of {{ certificate }}.key is {{ keyList.json['items'][0].id }}"
+  when: state == "present"
+
+- set_fact:
+    key_uuid: "{{ keyList.json['items'][0].id }}"
+  when: state == "present"
+
+
+- name: "Get UUID of {{ certificate }}.crt."
+  uri:
+    url: "https://{{ inventory_hostname }}/mgmt/cm/adc-core/working-config/sys/file/ssl-cert?$filter=name%20eq%20'{{ certificate }}.crt'"
+    method: GET
+    headers:
+      X-F5-Auth-Token: "{{auth.json.token.token}}"
+    force_basic_auth: no
+    status_code: 200
+    body_format: json
+    validate_certs: no
+  register: certList
+  delegate_to: localhost
+  when: state == "present"
+
+- debug:
+    msg: "UUID of {{ certificate }}.crt is {{ certList.json['items'][0].id }}"
+  when: state == "present"
+
+- set_fact:
+    cert_uuid: "{{ certList.json['items'][0].id }}"
+  when: state == "present"
+
+
+- name: "{{ mode }}  Application {{ j2template }} - {{ app_name }}"
+  uri:
+    url: https://{{ inventory_hostname }}/mgmt/cm/global/tasks/apply-template
+    method: POST
+    headers:
+      X-F5-Auth-Token: "{{auth.json.token.token}}"
+    body: "{{ lookup('template', 'AppService_{{ j2template }}.j2') }}"
+    force_basic_auth: no
+    status_code: 200,202
+    body_format: json
+    validate_certs: no
+  delegate_to: localhost
+  when: state == "present"
+
+
+# Remove Application Service
+############################
+- name: Remove Application {{ j2template }} - {{ app_name }}
+  uri:
+    url: https://{{ inventory_hostname }}/mgmt/cm/global/tasks/apply-template
+    method: POST
+    headers:
+      X-F5-Auth-Token: "{{auth.json.token.token}}"
+    body: "{\"configSetName\": \"{{ app_name }}\",\"mode\":\"DELETE\"}"
+    force_basic_auth: no
+    status_code: 200,202
+    body_format: json
+    validate_certs: no
+  delegate_to: localhost
+  when: state == "absent"
+
+
+...

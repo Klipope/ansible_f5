@@ -1,0 +1,53 @@
+{
+    "configSetName": "{{ app_name }}",
+    "resources": {
+        "ltm:node:45391b57b104": [
+{% for member in members %}
+            {
+                "parameters": {
+                    "name": "{{ member.ip }}",
+                    "address": "{{ member.ip }}"
+                },
+                "parametersToRemove": []
+  {% if loop.last %}
+            }
+  {% else %}
+            },
+  {% endif%}
+{% endfor %}
+        ],
+        "ltm:pool:be70d46c6d73": [
+            {
+                "parameters": {
+                    "name": "pool_0"
+                },
+                "parametersToRemove": [],
+                "subcollectionResources": {
+                    "members:dec6d24dc625": [
+ {% for member in members %}
+                       {
+                            "parameters": {
+                                "port": "{{ member.port }}",
+                                "nodeReference": {
+                                    "link": "#/resources/ltm:node:45391b57b104/{{ member.ip }}",
+                                    "fullPath": "# {{ member.ip }}"
+                                }
+                            },
+                            "parametersToRemove": []
+  {% if loop.last %}
+                        }
+  {% else %}
+                        },
+  {% endif%}
+{% endfor %}
+                    ]
+                }
+            }
+        ]
+    },
+    "subPath": "{{ app_name }}",
+    "templateReference": {
+        "link": "https://localhost/mgmt/cm/global/templates/{{ template_uuid }}"
+    },
+    "mode": "{{ mode }}"
+}

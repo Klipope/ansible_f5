@@ -1,0 +1,153 @@
+{
+    "configSetName": "{{ app_name }}",
+    "domains": [],
+    {{ defaultDeviceReference }}
+    "resources": {
+        "ltm:virtual:7a5f7da91996": [
+            {
+                "parameters": {
+                    "name": "default_vs_443",
+                    "destinationAddress": "{{ vip }}",
+                    "mask": "255.255.255.255",
+                    "destinationPort": "443"
+                },
+                "parametersToRemove": [],
+                "subcollectionResources": {
+                    "profiles:14c995c33411": [
+                        {
+                            "parameters": {},
+                            "parametersToRemove": []
+                        }
+                    ],
+                    "profiles:8ba4bb101701": [
+                        {
+                            "parameters": {},
+                            "parametersToRemove": []
+                        }
+                    ],
+                    "profiles:9448fe71611e": [
+                        {
+                            "parameters": {},
+                            "parametersToRemove": []
+                        }
+                    ],
+                    "profiles:b0f36f336181": [
+                        {
+                            "parameters": {},
+                            "parametersToRemove": []
+                        }
+                    ]
+                }
+            }
+        ],
+        "ltm:virtual:40e8c4a6f542": [
+            {
+                "parameters": {
+                    "name": "default_redirect_vs_80",
+                    "destinationAddress": "{{ vip }}",
+                    "mask": "255.255.255.255",
+                    "destinationPort": "80"
+                },
+                "parametersToRemove": [],
+                "subcollectionResources": {
+                    "profiles:8ba4bb101701": [
+                        {
+                            "parameters": {},
+                            "parametersToRemove": []
+                        }
+                    ],
+                    "profiles:9448fe71611e": [
+                        {
+                            "parameters": {},
+                            "parametersToRemove": []
+                        }
+                    ]
+                }
+            }
+        ],
+        "ltm:node:45391b57b104": [
+{% for member in members %}
+            {
+                "parameters": {
+                    "name": "{{ member.ip }}",
+                    "address": "{{ member.ip }}"
+                },
+                "parametersToRemove": []
+  {% if loop.last %}
+            }
+  {% else %}
+            },
+  {% endif%}
+{% endfor %}
+        ],
+        "ltm:pool:be70d46c6d73": [
+            {
+                "parameters": {
+                    "name": "pool_0"
+                },
+                "parametersToRemove": [],
+                "subcollectionResources": {
+                    "members:dec6d24dc625": [
+ {% for member in members %}
+                       {
+                            "parameters": {
+                                "port": "{{ member.port }}",
+                                "nodeReference": {
+                                    "link": "#/resources/ltm:node:45391b57b104/{{ member.ip }}",
+                                    "fullPath": "# {{ member.ip }}"
+                                }
+                            },
+                            "parametersToRemove": []
+  {% if loop.last %}
+                        }
+  {% else %}
+                        },
+  {% endif%}
+{% endfor %}
+                    ]
+                }
+            }
+        ],
+        "ltm:monitor:http:fd07629373b0": [
+            {
+                "parameters": {
+                    "name": "monitor-http"
+                },
+                "parametersToRemove": []
+            }
+        ],
+        "ltm:profile:client-ssl:14c995c33411": [
+            {
+                "parameters": {
+                    "name": "{{ certificate }}",
+                    "certKeyChain": [
+                        {
+                            "name": "www.f5demo.local",
+                            "certReference": {
+                                "link": "https://localhost/mgmt/cm/adc-core/working-config/sys/file/ssl-cert/{{ cert_uuid }}"
+                            },
+                            "keyReference": {
+                                "link": "https://localhost/mgmt/cm/adc-core/working-config/sys/file/ssl-key/{{ key_uuid }}"
+                            }
+                        }
+                    ]
+                },
+                "parametersToRemove": []
+            }
+        ],
+        "ltm:profile:http:8ba4bb101701": [
+            {
+                "parameters": {
+                    "name": "profile_http"
+                },
+                "parametersToRemove": []
+            }
+        ]
+    },
+    "addAnalytics": false,
+    "subPath": "{{ app_name }}",
+    "templateReference": {
+        "link": "https://localhost/mgmt/cm/global/templates/{{ template_uuid }}"
+    },
+    "mode": "{{ mode }}"
+}

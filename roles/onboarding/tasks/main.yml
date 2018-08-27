@@ -8,7 +8,7 @@
   when: partitions is defined
 
 - include_tasks: bigip_trunk.yml
-  when: trunk is defined
+  when: trunks is defined
 
 ########################################
 ## vlan
@@ -56,8 +56,9 @@
   loop: "{{ self_ips }}"
   delegate_to: localhost
 
-- include_tasks: bigip_static_route.yml
-  when: routes is defined
+# issue 752
+#- include_tasks: bigip_static_route.yml
+#  when: routes is defined
 
 ##############################################
 ## system settings
@@ -70,8 +71,10 @@
 
 - import_tasks: bigip_device_ntp/set_ntp_server.yml 
   vars: 
-    - ntp_server1: "0.de.pool.ntp.org" 
-    - ntp_server2: "1.de.pool.ntp.org"
+#    - ntp_server1: "0.de.pool.ntp.org" 
+#    - ntp_server2: "1.de.pool.ntp.org"
+    - ntp_server1: "nbsntp.nb.edeka.net"
+    - ntp_server2: "nbsntp.nb.edeka.net"
 
 - import_tasks: bigip_device_ntp/set_timezone.yml 
   vars:
@@ -85,21 +88,21 @@
     provider: "{{ provider }}"
   delegate_to: localhost
 
-- import_tasks: bigip_user/add_user.yml 
-  vars:
-    - username_credential: "ralf" 
-    - password_credential: "{{ ralf_password }}" 
-    - full_name: "ralf Bruenig" 
-    - partition_access: "all:admin" 
-    - update_password: "on_create"
+#- import_tasks: bigip_user/add_user.yml 
+#  vars:
+#    - username_credential: "ralf" 
+#    - password_credential: "{{ ralf_password }}" 
+#    - full_name: "ralf Bruenig" 
+#    - partition_access: "all:admin" 
+#    - update_password: "on_create"
 
-- import_tasks: bigip_user/add_user.yml 
-  vars: 
-    - username_credential: "bob" 
-    - password_credential: "{{ bob_password }}" 
-    - full_name: "Bob Bob" 
-    - partition_access: "Common:operator" 
-    - update_password: "on_create"
+#- import_tasks: bigip_user/add_user.yml 
+#  vars: 
+#    - username_credential: "bob" 
+#    - password_credential: "{{ bob_password }}" 
+#    - full_name: "Bob Bob" 
+#    - partition_access: "Common:operator" 
+#    - update_password: "on_create"
 
 
 #- import_tasks: bigip_ssl_certificate/import_certificate.yml

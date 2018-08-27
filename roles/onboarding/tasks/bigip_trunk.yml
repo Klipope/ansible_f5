@@ -6,6 +6,6 @@
     lacp_mode: "{{ item.lacp_mode }}"
     lacp_timeout: "{{ item.lacp_timeout }}"
     provider: "{{ provider }}"
-#  loop: "{{ trunks }}"
+  loop: "{{ trunks }}"
   delegate_to: localhost
 
