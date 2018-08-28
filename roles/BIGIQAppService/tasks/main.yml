@@ -46,7 +46,7 @@
 
 - set_fact:
     mode: "UPDATE"
-  when: (state == "present") and (appList.json.totalItems > 0)
+  when: (state == "present") and (appList.json.totalItems != 0)
 
 - debug:
     msg: "Mode is {{ mode }}"

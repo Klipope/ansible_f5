@@ -24,9 +24,9 @@
 #      - certificate: "app01.f5demo.local"
       - vip: "10.1.10.27"
       - members:
-#        -
-#          ip: "10.1.20.121"
-#          port: 80
+        -
+          ip: "10.1.20.121"
+          port: 80
         -
           ip: "10.1.20.122"
           port: 80
