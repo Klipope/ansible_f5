@@ -1,13 +1,15 @@
 {
-    "configSetName": "{{ app_name }}",
+    "configSetName": "my_app",
     "domains": [],
-    {{ defaultDeviceReference }}
+    "defaultDeviceReference": {
+        "link": "https://localhost/mgmt/shared/resolver/device-groups/cm-adccore-allbigipDevices/devices/ba7382a4-7564-4647-b65d-17d6f2a73a16"
+    },
     "resources": {
         "ltm:virtual:7a5f7da91996": [
             {
                 "parameters": {
                     "name": "default_vs_443",
-                    "destinationAddress": "{{ vip }}",
+                    "destinationAddress": "10.1.10.120",
                     "mask": "255.255.255.255",
                     "destinationPort": "443"
                 },
@@ -44,7 +46,7 @@
             {
                 "parameters": {
                     "name": "default_redirect_vs_80",
-                    "destinationAddress": "{{ vip }}",
+                    "destinationAddress": "10.1.10.120",
                     "mask": "255.255.255.255",
                     "destinationPort": "80"
                 },
@@ -66,19 +68,20 @@
             }
         ],
         "ltm:node:45391b57b104": [
-{% for member in members %}
             {
                 "parameters": {
-                    "name": "{{ member.ip }}",
-                    "address": "{{ member.ip }}"
+                    "name": "10.1.20.110",
+                    "address": "10.1.20.110"
                 },
                 "parametersToRemove": []
-  {% if loop.last %}
-            }
-  {% else %}
             },
-  {% endif%}
-{% endfor %}
+            {
+                "parameters": {
+                    "name": "10.1.20.111",
+                    "address": "10.1.20.111"
+                },
+                "parametersToRemove": []
+            }
         ],
         "ltm:pool:be70d46c6d73": [
             {
@@ -88,22 +91,26 @@
                 "parametersToRemove": [],
                 "subcollectionResources": {
                     "members:dec6d24dc625": [
- {% for member in members %}
-                       {
+                        {
                             "parameters": {
-                                "port": "{{ member.port }}",
+                                "port": 80,
                                 "nodeReference": {
-                                    "link": "#/resources/ltm:node:45391b57b104/{{ member.ip }}",
-                                    "fullPath": "# {{ member.ip }}"
+                                    "link": "#/resources/ltm:node:45391b57b104/10.1.20.110",
+                                    "fullPath": "# 10.1.20.110"
                                 }
                             },
                             "parametersToRemove": []
-  {% if loop.last %}
-                        }
-  {% else %}
                         },
-  {% endif%}
-{% endfor %}
+                        {
+                            "parameters": {
+                                "port": "80",
+                                "nodeReference": {
+                                    "link": "#/resources/ltm:node:45391b57b104/10.1.20.111",
+                                    "fullPath": "# 10.1.20.111"
+                                }
+                            },
+                            "parametersToRemove": []
+                        }
                     ]
                 }
             }
@@ -119,15 +126,17 @@
         "ltm:profile:client-ssl:14c995c33411": [
             {
                 "parameters": {
-                    "name": "{{ certificate }}",
+                    "name": "clientssl",
                     "certKeyChain": [
                         {
-                            "name": "{{ certificate }}",
+                            "name": "www.f5demo.local",
                             "certReference": {
-                                "link": "https://localhost/mgmt/cm/adc-core/working-config/sys/file/ssl-cert/{{ cert_uuid }}"
+                                "link": "https://localhost/mgmt/cm/adc-core/working-config/sys/file/ssl-cert/9b6edbf5-acbe-3da8-89ce-bc8711b90490",
+                                "fullPath": "/Common/www.f5demo.local.crt"
                             },
                             "keyReference": {
-                                "link": "https://localhost/mgmt/cm/adc-core/working-config/sys/file/ssl-key/{{ key_uuid }}"
+                                "link": "https://localhost/mgmt/cm/adc-core/working-config/sys/file/ssl-key/fb759457-cfcb-3e3a-80c7-c2807aef318b",
+                                "fullPath": "/Common/www.f5demo.local.key"
                             }
                         }
                     ]
@@ -145,9 +154,9 @@
         ]
     },
     "addAnalytics": false,
-    "subPath": "{{ app_name }}",
+    "subPath": "my_app",
     "templateReference": {
-        "link": "https://localhost/mgmt/cm/global/templates/{{ template_uuid }}"
+        "link": "https://localhost/mgmt/cm/global/templates/5695865f-d14b-3ea4-ae7a-4f0ac73b7009"
     },
-    "mode": "{{ mode }}"
+    "mode": "CREATE"
 }
