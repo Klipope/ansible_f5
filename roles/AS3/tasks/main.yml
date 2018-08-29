@@ -1,0 +1,62 @@
+---
+##############################################
+# Add/Remove Application Service over BIG-IQ #
+##############################################
+
+- name: get auth token
+  uri:
+    url: https://{{ inventory_hostname }}/mgmt/shared/authn/login
+    method: POST
+    user: "{{ username }}"
+    password: "{{ password }}"
+    body: "{
+              \"username\":\"{{username}}\",
+              \"password\":\"{{password}}\",
+              \"loginProviderName\": \"local\"
+      }"
+    force_basic_auth: yes
+    status_code: 200
+    body_format: json
+    validate_certs: no
+  register: auth
+  delegate_to: localhost
+
+
+
+# Add or update Application Service
+###################################
+
+
+- name: "Create or modify Application {{ j2template }} - {{ app_name }}"
+  uri:
+    url: https://{{ inventory_hostname }}/mgmt/shared/appsvcs/declare
+    method: POST
+    headers:
+      X-F5-Auth-Token: "{{auth.json.token.token}}"
+      Expect: ""
+    body: "{{ lookup('template', 'AS3_{{ j2template }}.j2') }}"
+    force_basic_auth: no
+    status_code: 200,202
+    body_format: json
+    validate_certs: no
+  delegate_to: localhost
+  when: state == "present"
+
+
+# Remove Application Service
+############################
+- name: Remove Application {{ j2template }} - {{ app_name }}
+  uri:
+    url: https://{{ inventory_hostname }}/mgmt/shared/appsvcs/declare/{{ app_name }}
+    method: DELETE
+    headers:
+      X-F5-Auth-Token: "{{auth.json.token.token}}"
+    force_basic_auth: no
+    status_code: 200,202
+    body_format: json
+    validate_certs: no
+  delegate_to: localhost
+  when: state == "absent"
+
+
+...
