@@ -1,6 +1,91 @@
 ---
-master: "10.10.86.30"
-ext_floating_self_ip: "10.128.10.32"
-int_floating_self_ip: "10.10.10.32"
+#master: "10.10.86.30"
+
+partitions:
+  - name: "extDMZ"
+    routedomain: 1
+  - name: "part2"
+  - name: "part3"
+  - name: "demo"
+
+provisioning:
+  - module: "ltm"
+    state: "present"
+    level: "nominal"
+  - module: "avr"
+    state: "present"
+    level: "nominal"
+
+#trunks:
+#  - name: trank1
+#    lacp_enabled: yes
+#    lacp_mode: active
+#    lacp_timeout: short
+#    interfaces:
+#      - 1.3
+#      - 1.4
+
+routes:
+  - name: "default_GW_v4"
+    destination: "0.0.0.0"
+    netmask: "0.0.0.0"
+    gateway: "10.128.10.2"
+    route_domain: 1
+    partition: "extDMZ"
+
+vlans:
+  - name: external
+    partition: "extDMZ"
+    tag: 81
+    interfaces:
+      tagged:
+      untagged:
+        - 1.1
+  - name: internal
+    partition: "extDMZ"
+    tag: 10
+    interfaces:
+      tagged:
+      untagged:
+        - 1.2
+  - name: ha
+    partition: "Common"
+    tag: 112
+    interfaces:
+      tagged:
+        - 1.3
+      untagged:
+  - name: sy
+    partition: "Common"
+    tag: 113
+    interfaces:
+      tagged:
+        - 1.3
+      untagged:
+
+routedomains:
+  - name: "extDMZ"
+    partition: "extDMZ"
+    id: 1
+    vlans:
+      - "/extDMZ/internal"
+      - "/extDMZ/external"
+
+floating_self_ips:
+  - name: ext_floating_self_v4
+    partition: "extDMZ"
+    address: "10.128.10.32"
+    netmask: "255.255.255.0"
+    vlan: "/extDMZ/external"
+    route_domain: 1
+    traffic_group: "/Common/traffic-group-1"
+  - name: int_floating_self_v4
+    partition: "extDMZ"
+    address: "10.10.10.32"
+    netmask: "255.255.255.0"
+    vlan: "/extDMZ/internal"
+    route_domain: 1
+    traffic_group: "/Common/traffic-group-1"
+
 device_group_name: "main_dg"
 ...

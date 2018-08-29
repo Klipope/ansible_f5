@@ -2,12 +2,10 @@
 - name: Manage the iRule contained in the static file bodgeit-rewrite.tcl to the LTM module
   bigip_irule:
     name: "OutOfService_Response"
-    user: "{{ username }}"
-    password: "{{ password }}"
-    server: "{{ inventory_hostname }}"
     module: "ltm"
     content: "{{ lookup('file', 'irules/apology_page.tcl') }}"
-    validate_certs: "false"
+    partition: "{{ partition }}"
+    provider: "{{ provider }}"
     state: "{{ state }}"
   delegate_to: localhost
 ...

@@ -1,0 +1,9 @@
+---
+- name: Set config sync address  
+  bigip_command:
+    provider: "{{ provider }}"
+    commands:
+    - modify cm device {{ hostname }} configsync-ip {{ address }}
+  delegate_to: localhost
+...
+

@@ -1,0 +1,12 @@
+---
+- name: Add trusts for all peer devices
+  bigip_device_trust:
+    provider: "{{ provider }}"
+    peer_server: "{{ hostvars[item].mgmt_ip }}"
+    peer_hostname: "{{ hostvars[item].hostname }}"
+    peer_user: "{{ username }}"
+    peer_password: "{{ password }}"
+  loop: "{{ ansible_play_hosts }}"
+  when: inventory_hostname == ansible_play_hosts[0] and item != ansible_play_hosts[0]
+  delegate_to: localhost
+...

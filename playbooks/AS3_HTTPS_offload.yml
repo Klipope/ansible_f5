@@ -1,0 +1,33 @@
+#####################################################
+# Deployment wit the default HTTPS offload template #
+#####################################################
+#
+#vars:
+#  - app_name: <name of the application>
+#  - device_name: <hostname of the target BIG-IP>
+#  - certificate: <name of the key and certificate used in the clientssl profile>
+#  - vip: <virtual server ip address>
+#  - members:
+#    -
+#      ip: <pool member ip>
+#      port: <pool member port>
+#
+---
+  - hosts: "{{ target }}"
+    gather_facts: False
+    roles:
+      - AS3
+    vars:
+      - app_name: "https_as3_demo1"
+      - vip: "10.128.10.27"
+      - member_port: 80
+      - member_addr:
+        - "10.10.10.221"
+        - "10.10.10.222"
+        - "10.10.10.223"
+#        - "10.10.10.224"
+
+
+## don't touch: ##
+      - j2template: "HTTPS_offload"
+...

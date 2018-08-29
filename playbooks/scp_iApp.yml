@@ -23,17 +23,24 @@
     roles:
       - iAppService
     vars:
-      - app_name: "scp_server"
-      - vip: "10.128.10.21" 
-      - members:
-        -
-          ip: "10.10.10.212"
-          conn_limit: "20"
-        -
-          ip: "10.10.10.213"
-          conn_limit: "20"
+      partition: "Common"
+      app_name: "scp_server"
+      vip: "10.128.10.21" 
+      members:
+      -
+        ip: "10.10.10.212"
+        conn_limit: "20"
+      -
+        ip: "10.10.10.213"
+        conn_limit: "20"
 
 ## don't touch: ##
-      - f5template: "appsvcs_integration_v2.0.004_waf"
-      - j2template: "appsvcs_scp"
+      f5template: "/Common/appsvcs_integration_v2.0.004_waf"
+      j2template: "appsvcs_scp"
+      provider:
+        server: "{{ inventory_hostname }}"
+        server_port: "443"
+        user: "{{ username }}"
+        password: "{{ password }}"
+        validate_certs: "no"
 ...

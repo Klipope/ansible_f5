@@ -1,0 +1,42 @@
+- name: Deploy application on BIG-IQ
+  hosts: udf
+  gather_facts: false
+  vars:
+    provider:
+      server: "{{ inventory_hostname }}"
+      server_port: "443"
+      user: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: "no"
+
+  tasks:
+
+  - name: Load balance an HTTPS application on port 443 with SSL offloading on BIG-IP
+    bigiq_application_https_offload:
+      name: my-HTTPS-app
+      description: Redirect HTTP to HTTPS
+      service_environment: BOS-vBIGIP01.termmarc.com 
+      servers:
+        - address: 10.1.20.112
+          port: 80
+        - address: 10.1.20.113
+          port: 80
+        - address: 10.1.20.114
+          port: 80
+      inbound_virtual:
+        address: 10.1.10.112
+        netmask: 255.255.255.255
+        port: 443
+      redirect_virtual:
+        address: 10.1.10.112
+        netmask: 255.255.255.255
+        port: 80
+#      client_ssl_profile:
+#        name: www.f5demo.local
+#        cert_key_chain:
+#          - key: "/Common/www.f5demo.local.key"
+#            cert: "/Common/www.f5demo.local.crt"
+      state: "{{ state }}"
+      provider: "{{ provider }}"
+    delegate_to: localhost
+

@@ -1,12 +1,10 @@
 ---
 - name: Add a new node
   bigip_node:
-    server: "{{ inventory_hostname }}"
-    user: "{{ username }}"
-    password: "{{ password }}"
+    provider: "{{ provider }}"
     host: "{{ host }}"
     name: "{{ name }}"
-    validate_certs: "false"
+    partition: "{{ partition }}"
     state: "{{ state }}"
     monitors:
       - "{{ monitor }}"

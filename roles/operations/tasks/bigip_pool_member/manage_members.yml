@@ -1,13 +1,14 @@
 ---
 - name: Manage members in a pool
   bigip_pool_member:
-    server: "{{ inventory_hostname }}"
+    provider: "{{ provider }}"
     user: "{{ username }}"
     password: "{{ password }}"
+    server: "{{ inventory_hostname }}"
     host: "{{ host }}"
     pool: "{{ pool }}"
     port: "{{ port }}"
+    partition: "{{ partition }}"
     state: "{{ state }}"
-    validate_certs: "false"
   delegate_to: localhost
 ...

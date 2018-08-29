@@ -5,11 +5,9 @@
 
 - name: Deploy iApp template {{ f5template }}.tmpl
   bigip_iapp_template:
-    user: "{{username}}"
-    password: "{{password}}"
-    server: "{{ inventory_hostname }}"
     content: "{{ lookup('file', '{{ f5template }}.tmpl') }}"
     state: "{{ state }}"
+    provider: "{{ provider }}"
   delegate_to: localhost
 
 ...

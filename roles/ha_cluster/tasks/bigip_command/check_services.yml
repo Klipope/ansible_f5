@@ -1,0 +1,30 @@
+---
+# bigd is one of the last daemon to get active
+- name: Check if services are available
+  bigip_command:
+    user: "{{ username }}"
+    password: "{{ password }}"
+    server: "{{ inventory_hostname }}"
+    commands:
+      - show sys service bigd
+    wait_for:
+      - result[0] contains "run"
+    match: all
+    interval: 2
+    retries: 60
+    validate_certs: "no"
+  delegate_to: localhost
+  register: service_status
+
+# If the command above was not started for one of the two hosts in the group,
+# the following debug will fail, because of the undefined service_status
+# This is to make sure all further setup will be stopped, to avoid undefined status in the ha setup.
+- name: Predetermined breaking point
+  debug:
+    msg:
+      - "hosts: {{ play_hosts }}"
+      #- "Service check Output: {{ service_status.stdout[0] }}"
+      - "{{ play_hosts[0] }} status: {{ hostvars[play_hosts[0]].service_status.stdout[0] }}"
+      - "{{ play_hosts[1] }} status: {{ hostvars[play_hosts[1]].service_status.stdout[0] }}"
+
+...

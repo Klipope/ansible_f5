@@ -5,6 +5,11 @@
       - iAppTemplate 
 
     vars:
-      - f5template: "appsvcs_integration_v2.0.004_waf"
-
+      f5template: "appsvcs_integration_v2.0.004_waf"
+      provider:
+        server: "{{ inventory_hostname }}"
+        server_port: "443"
+        user: "{{ username }}"
+        password: "{{ password }}"
+        validate_certs: "no"
 ...

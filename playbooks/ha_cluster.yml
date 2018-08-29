@@ -1,0 +1,15 @@
+---
+- hosts: "{{ target }}"
+  gather_facts: False
+  roles:
+    - ha_cluster
+
+  vars:
+    provider:
+      server: "{{ inventory_hostname }}"
+      server_port: "443"
+      user: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: "no"
+
+...

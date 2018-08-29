@@ -1,19 +1,41 @@
 ---
 mgmt_ip: 10.10.86.30
+hostname: "bigip_a.demo.local"
 
-license_key: "KIMDP-WTWAP-RXTXE-CZNAZ-PISRPAG"
-ext_self_ip: "10.128.10.30"
-ext_netmask: "255.255.255.0"
+self_ips:
+  - name: ext_self_v4
+    partition: "extDMZ"
+    address: "10.128.10.30"
+    netmask: "255.255.255.0"
+    vlan: "/extDMZ/external"
+    route_domain: 1
+  - name: int_self_v4
+    partition: "extDMZ"
+    address: "10.10.10.30"
+    netmask: "255.255.255.0"
+    vlan: "/extDMZ/internal"
+    route_domain: 1
+  - name: ha_self_v4
+    partition: "Common"
+    address: "1.1.1.30"
+    netmask: "255.255.255.0"
+    vlan: "ha"
+    route_domain: 0
+  - name: sy_self_v4
+    partition: "Common"
+    address: "10.1.1.30"
+    netmask: "255.255.255.0"
+    vlan: "sy"
+    route_domain: 0
 
-int_self_ip: "10.10.10.30"
-int_netmask: "255.255.255.0"
 
-ha_self_ip: "1.1.1.30"
-ha_netmask: "255.255.255.0"
 
-hostname: "bigip-ha-a.demo.local"
+# HA setup
+config_sync_ip: "{{ self_ips[3].address }}"
+mirror_primary_address: "{{ self_ips[3].address }}"
+unicast_failover:
+  - address: "{{ self_ips[2].address }}"
+  - address: "{{ mgmt_ip }}"
 
-peer_host: "10.10.86.31"
-peer_hostname: "bigip-ha-b.demo.local"
 
 ...

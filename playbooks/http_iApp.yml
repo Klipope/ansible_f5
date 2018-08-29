@@ -20,18 +20,25 @@
     roles:
       - iAppService
     vars:
-      - app_name: "http_app_22"
-      - vip: "10.128.10.22"
-      - vip_2: "2011:f5::10:128:10:22"
-      - members:
-        -
-          ip: "10.10.10.211"
-          port: "80"
-        -
-          ip: "10.10.10.212"
-          port: "80"
+      partition: "Common"
+      app_name: "http_app_22"
+      vip: "10.128.10.22"
+      vip_2: "2011:f5::10:128:10:22"
+      members:
+      -
+        ip: "10.10.10.211"
+        port: "80"
+      -
+        ip: "10.10.10.212"
+        port: "80"
 
 ## don't touch: ##
-      - f5template: "appsvcs_integration_v2.0.004_waf"
-      - j2template: "appsvcs_http"
+      f5template: "/Common/appsvcs_integration_v2.0.004_waf"
+      j2template: "appsvcs_http"
+      provider:
+        server: "{{ inventory_hostname }}"
+        server_port: "443"
+        user: "{{ username }}"
+        password: "{{ password }}"
+        validate_certs: "no"
 ...

@@ -1,0 +1,12 @@
+---
+- name: Add self IP {{ hostvars[172.29.86.12] }} - {{ hostvars[172.29.86.22] }} - {{ hostvars[172.29.86.32] }}
+  bigip_selfip:
+    provider: "{{ provider }}"
+    name: "{{ name }}"
+    address: "{{ address }}"
+    netmask: "{{ netmask }}"
+    vlan: "{{ vlan_name }}"
+    route_domain: "{{ route_domain }}"
+    traffic_group: "{{ traffic_group }}"
+  delegate_to: localhost
+...

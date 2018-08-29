@@ -1,0 +1,41 @@
+#####################################################
+# Deployment wit the default HTTPS offload template #
+#####################################################
+#
+#vars:
+#  - app_name: <name of the application>
+#  - device_name: <hostname of the target BIG-IP>
+#  - certificate: <name of the key and certificate used in the clientssl profile>
+#  - vip: <virtual server ip address>
+#  - members:
+#    -
+#      ip: <pool member ip>
+#      port: <pool member port>
+#
+---
+  - hosts: "{{ target }}"
+    gather_facts: False
+    roles:
+      - BIGIQAppService
+    vars:
+      - app_name: "https_demo4"
+      - device_name: "BOS-vBIGIP01.termmarc.com"
+      - certificate: "www.f5demo.local"
+#      - certificate: "app01.f5demo.local"
+      - vip: "10.1.10.27"
+      - members:
+        -
+          ip: "10.1.20.121"
+          port: 80
+        -
+          ip: "10.1.20.122"
+          port: 80
+        -
+          ip: "10.1.20.123"
+          port: 80
+
+
+## don't touch: ##
+      - template_name: "Default-f5-HTTPS-offload-lb-template"
+      - j2template: "default_HTTPS_offload"
+...

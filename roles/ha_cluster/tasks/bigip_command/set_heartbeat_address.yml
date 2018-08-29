@@ -1,0 +1,8 @@
+---
+- name: Set unicast haertbeat address 
+  bigip_command:
+    provider: "{{ provider }}"
+    commands:
+    - modify cm device {{ hostname }} unicast-address { { ip {{ address }} } { ip {{ mgmt_address }} } }
+  delegate_to: localhost
+...

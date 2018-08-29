@@ -1,0 +1,8 @@
+---
+- name: Set mirroring address 
+  bigip_command:
+    provider: "{{ provider }}"
+    commands:
+    - modify cm device {{ hostname }} mirror-ip {{ address }}
+  delegate_to: localhost
+...

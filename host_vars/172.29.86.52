@@ -1,0 +1,45 @@
+---
+mgmt_ip: 172.29.86.52
+hostname: "hen-bigip-01.edeka.local"
+
+self_ips:
+  - name: ha_self_v4
+    partition: "Common"
+    address: "172.16.205.2"
+    netmask: "255.255.255.0"
+    vlan: "/Common/VLAN1205"
+    route_domain: 0
+  - name: mirror_self_v4
+    partition: "Common"
+    address: "172.16.206.2"
+    netmask: "255.255.255.0"
+    vlan: "/Common/VLAN1206"
+    route_domain: 0
+  - name: iDMZ_self_v4
+    partition: "DMZ"
+    address: "10.61.110.226"
+    netmask: "255.255.255.240"
+    vlan: "/DMZ/VLAN1123"
+    route_domain: 1
+  - name: eDMZ_self_v4
+    partition: "DMZ"
+    address: "10.61.112.244"
+    netmask: "255.255.255.240"
+    vlan: "/DMZ/VLAN1223"
+    route_domain: 1
+  - name: Server_self_v4
+    partition: "DCLAN"
+    address: "10.61.60.62"
+    netmask: "255.255.255.0"
+    vlan: "/DCLAN/VLAN60"
+    route_domain: 2
+
+# HA setup
+config_sync_ip: "{{ self_ips[1].address }}"
+mirror_primary_address: "{{ self_ips[1].address }}"
+unicast_failover:
+  - address: "{{ self_ips[0].address }}"
+  - address: "{{ mgmt_ip }}"
+
+
+...
