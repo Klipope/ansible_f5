@@ -1,6 +1,7 @@
 ---
 
 gui_idle_timeout: 2400
+records_per_screen: 80
 
 name_server_list:
   - "10.128.10.2"
@@ -8,5 +9,10 @@ name_server_list:
 search_domain_list:
   - "localdomain"
   - "lab.local"
+
+ntp_server_list:
+  - "0.de.pool.ntp.org"
+  - "1.de.pool.ntp.org"
+timezone: "Europe/Berlin"
 
 ...
