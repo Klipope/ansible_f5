@@ -1,0 +1,158 @@
+{
+    "schemaVersion": "1.0.0",
+    "class": "Device",
+    "async": "true",
+    "label": "my BIG-IP declaration for declarative onboarding",
+    "Common": {
+        "class": "Tenant",
+        "hostname": "{{ hostname }}",
+        "myLicense": {
+            "class": "License",
+            "licenseType": "regKey",
+            "regKey": "{{ regKey }}"
+        },
+        "myDns": {
+            "class": "DNS",
+            "nameServers": [
+              "{{ name_server_list|join('", "') }}"
+            ],
+            "search": [
+              "{{ search_domain_list|join('", "') }}"
+            ]
+        },
+        "myNtp": {
+            "class": "NTP",
+            "servers": [
+              "{{ ntp_server_list|join('", "') }}"
+            ],
+            "timezone": "{{ timezone }}"
+        },
+        "root": {
+            "class": "User",
+            "userType": "root",
+            "oldPassword": "default",
+            "newPassword": "default"
+        },
+        "admin": {
+            "class": "User",
+            "userType": "regular",
+            "password": "admin",
+            "shell": "bash"
+        },
+{% for vlan in vlans %}
+  {% if vlan.partition is not defined or vlan.partition == "Common" %}
+        "{{ vlan.name }}": {
+            "class": "VLAN",
+            "tag": {{ vlan.tag }},
+            "mtu": 1500,
+            "interfaces": [
+    {% if vlan.interfaces.tagged is defined and vlan.interfaces.tagged is iterable %}
+      {% for interface in vlan.interfaces.tagged %}
+                {
+                    "name": "{{ interface }}",
+                    "tagged": true
+                }{% if loop.last and not ( vlan.interfaces.untagged is defined and vlan.interfaces.untagged is iterable)  %}{% else %},{% endif%}
+      {% endfor %}
+    {% endif %}
+    {% if vlan.interfaces.untagged is defined and vlan.interfaces.untagged is iterable %}
+      {% for interface in vlan.interfaces.untagged %}
+                {
+                    "name": "{{ interface }}",
+                    "tagged": false
+                }{% if loop.last %}{% else %},{% endif%}
+      {% endfor %}
+    {% endif %}
+            ]
+        },
+  {% endif %}
+{% endfor %}
+{% for self in self_ips %}
+  {% if self.partition is not defined or self.partition == "Common" %}
+        "{{ self.name }}": {
+            "class": "SelfIp",
+            "address": "{{ self.address }}/{{ self.subnet }}",
+            "vlan": "{{ self.vlan }}",
+            "allowService": "default",
+            "trafficGroup": "traffic-group-local-only"
+        },
+  {% endif %}
+{% endfor %}
+{% if routes is defined %}
+  {% for route in routes %}
+    {% if route.partition is not defined or route.partition == "Common" %}
+        "{{ route.name }}": {
+            "class": "Route",
+            "gw": "{{ route.gateway }}",
+            "network": "default",
+            "mtu": 0
+        },
+    {% endif %}
+  {% endfor %}
+{% endif %}
+        "dbvars": {
+        	"class": "DbVariables",
+        	"ui.advisory.enabled": true,
+        	"ui.advisory.color": "green",
+        	"ui.advisory.text": "/Common/hostname",
+                "ui.system.preferences.recordsperscreen": "{{ records_per_screen }}" 
+        }
+    }
+{% if partitions is defined %}
+  {% for partition in partitions %}
+    ,"{{ partition.name }}": {
+        "class": "Tenant"
+    {% for vlan in vlans %}
+      {% if vlan.partition is defined and vlan.partition == "{{ partition.name }}" %}
+        ,"{{ vlan.name }}": {
+            "class": "VLAN",
+            "tag": {{ vlan.tag }},
+            "mtu": 1500,
+            "interfaces": [
+        {% if vlan.interfaces.tagged is defined and vlan.interfaces.tagged is iterable %}
+          {% for interface in vlan.interfaces.tagged %}
+                {
+                    "name": "{{ interface }}",
+                    "tagged": true
+                }{% if loop.last and not ( vlan.interfaces.untagged is defined and vlan.interfaces.untagged is iterable)  %}{% else %},{% endif%}
+        {% endfor %}
+        {% endif %}
+        {% if vlan.interfaces.untagged is defined and vlan.interfaces.untagged is iterable %}
+          {% for interface in vlan.interfaces.untagged %}
+                {
+                    "name": "{{ interface }}",
+                    "tagged": false
+                }{% if loop.last %}{% else %},{% endif%}
+          {% endfor %}
+        {% endif %}
+            ]
+        }
+      {% endif %}
+    {% endfor %}
+    {% for self in self_ips %}
+      {% if self.partition is defined and self.partition == "{{ partition.name }}" %}
+        ,"{{ self.name }}": {
+            "class": "SelfIp",
+            "address": "{{ self.address }}/{{ self.subnet }}",
+            "vlan": "{{ self.vlan }}",
+            "allowService": "default",
+            "trafficGroup": "traffic-group-local-only"
+        }
+      {% endif %}
+    {% endfor %}
+    {% if routes is defined %}
+      {% for route in routes %}
+        {% if route.partition is defined and route.partition == "{{ partition.name }}" %}
+        "{{ route.name }}": {
+            "class": "Route",
+            "gw": "{{ route.gateway }}",
+            "network": "default",
+            "mtu": 0
+        },
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    }
+  {% endfor %}
+{% endif %}
+}
+

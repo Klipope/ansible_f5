@@ -1,30 +1,35 @@
 ---
 mgmt_ip: 10.10.86.30
-hostname: "bigip_a.demo.local"
+hostname: "bigip-a.demo.local"
+regKey: "EENKS-EDSUN-XJEGU-EDUCL-ZZPQYAN"
 
 self_ips:
   - name: ext_self_v4
-    partition: "extDMZ"
+    partition: "Common"
     address: "10.128.10.30"
     netmask: "255.255.255.0"
-    vlan: "/extDMZ/external"
-    route_domain: 1
+    subnet: "24"
+    vlan: "external"
+    route_domain: 0
   - name: int_self_v4
-    partition: "extDMZ"
+    partition: "Common"
     address: "10.10.10.30"
     netmask: "255.255.255.0"
-    vlan: "/extDMZ/internal"
-    route_domain: 1
+    subnet: "24"
+    vlan: "internal"
+    route_domain: 0
   - name: ha_self_v4
     partition: "Common"
     address: "1.1.1.30"
     netmask: "255.255.255.0"
+    subnet: "24"
     vlan: "ha"
     route_domain: 0
   - name: sy_self_v4
     partition: "Common"
     address: "10.1.1.30"
     netmask: "255.255.255.0"
+    subnet: "24"
     vlan: "sy"
     route_domain: 0
 

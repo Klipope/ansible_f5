@@ -1,0 +1,108 @@
+---
+##############################################
+# Add/Remove Application Service over BIG-IQ #
+##############################################
+
+- name: get auth token
+  uri:
+    url: https://{{ inventory_hostname }}/mgmt/shared/authn/login
+    method: POST
+    user: "{{ username }}"
+    password: "{{ password }}"
+    body: "{
+              \"username\":\"{{username}}\",
+              \"password\":\"{{password}}\",
+              \"loginProviderName\": \"tmos\"
+      }"
+    force_basic_auth: yes
+    status_code: 200
+    body_format: json
+    validate_certs: no
+  register: auth
+  delegate_to: localhost
+
+# Install DO and AS3 rpm package
+################################
+
+- name: "Allow bash access for admin user"
+  uri:
+    url: https://{{ inventory_hostname }}/mgmt/tm/auth/user/admin
+    method: PATCH
+    headers:
+      X-F5-Auth-Token: "{{auth.json.token.token}}"
+      Expect: ""
+    body: "{\"shell\": \"bash\"}"
+    force_basic_auth: no
+    status_code: 200,202
+    body_format: json
+    validate_certs: no
+  delegate_to: localhost
+
+- name: Enable iAppLX
+  file:
+    path: /var/config/rest/iapps/enable
+    state: touch
+
+- name: Add Declarativ Onboarding iAppLX package {{ DOrpm }}
+  bigip_iapplx_package:
+    package: "../roles/DO/files/{{ DOrpm }}"
+    provider: "{{ provider }}"
+    state: present
+  delegate_to: localhost
+
+- name: Add Application Service 3 iAppLX package {{ AS3rpm }}
+  bigip_iapplx_package:
+    package: "../roles/DO/files/{{ AS3rpm }}"
+    provider: "{{ provider }}"
+    state: present
+  delegate_to: localhost
+
+
+
+# Add or update Application Service
+###################################
+
+
+- name: Debug jinja2
+  debug:
+    msg: "Onboarding Declaration:\n{{ lookup('template', 'DOtemplateStandalone.j2') }}"
+
+- name: "Declarative Deployment"
+  uri:
+    url: https://{{ inventory_hostname }}/mgmt/shared/declarative-onboarding
+    method: POST
+    headers:
+      X-F5-Auth-Token: "{{auth.json.token.token}}"
+      Expect: ""
+    body: "{{ lookup('template', 'DOtemplateStandalone.j2') }}"
+    force_basic_auth: no
+    status_code: 200,202
+    body_format: json
+    validate_certs: no
+  delegate_to: localhost
+
+
+- name: Wait until Deployment is done
+  uri:
+    url: "https://{{ inventory_hostname }}/mgmt/shared/declarative-onboarding"
+    method: GET
+    status_code: 200,202
+    timeout: 300
+    user: "{{ username }}"
+    password: "{{ password }}"
+    validate_certs: "no"
+    return_content: yes
+  until: OnboardingReady.json.result is not defined or OnboardingReady.json.result.status == "OK"
+  retries: 30
+  delay: 5
+  register: OnboardingReady
+
+- name: Onboarding Status
+  debug: 
+    msg:
+      - "Message: {{ OnboardingReady.json.message }}"
+      - "Status: {{ OnboardingReady.json.status }}"
+      - "Error: {{ OnboardingReady.json.error }}"
+  when: OnboardingReady.json.error is defined
+
+...
