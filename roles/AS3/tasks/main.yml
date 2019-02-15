@@ -47,10 +47,12 @@
 ############################
 - name: Remove Application {{ j2template }} - {{ app_name }}
   uri:
-    url: https://{{ inventory_hostname }}/mgmt/shared/appsvcs/declare/{{ app_name }}
-    method: DELETE
+    url: https://{{ inventory_hostname }}/mgmt/shared/appsvcs/declare
+    method: POST
     headers:
       X-F5-Auth-Token: "{{auth.json.token.token}}"
+      Expect: ""
+    body: "{{ lookup('template', 'AS3_remove.j2') }}"
     force_basic_auth: no
     status_code: 200,202
     body_format: json

@@ -18,6 +18,7 @@
     roles:
       - AS3
     vars:
+      - tenant: "AS3demo"
       - app_name: "https_as3_demo1"
       - vip: "10.128.10.27"
       - member_port: 80
