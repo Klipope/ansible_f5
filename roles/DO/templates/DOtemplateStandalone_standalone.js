@@ -105,51 +105,7 @@
         	"ui.advisory.color": "green",
         	"ui.advisory.text": "/Common/hostname",
                 "ui.system.preferences.recordsperscreen": "{{ records_per_screen }}" 
-        },
-
-{#
-{% if inventory_hostname == ansible_play_hosts[0] %}
-  {% for self in floating_self_ips %}
-    {% if self.partition is not defined or self.partition == "Common" %}
-          "{{ self.name }}": {
-              "class": "SelfIp",
-              "address": "{{ self.address }}/{{ self.subnet }}",
-              "vlan": "{{ self.vlan }}",
-              "allowService": "default",
-              "trafficGroup": "{{ self.traffic_group }}"
-          },
-    {% endif %}
-  {% endfor %}
-{% endif %}
-#}
-        "configsync": {
-            "class": "ConfigSync",
-            "configsyncIp": "{{ config_sync_ip }}"
-        },
-        "failoverAddress": {
-             "class": "FailoverUnicast",
-             "address": "{{ unicast_failover[0].address }}"
-         },
-         "failoverGroup": {
-             "class": "DeviceGroup",
-             "type": "sync-failover",
-             "members": [ {% for host in ansible_play_hosts %}"{{ hostvars[host].hostname }}"{% if loop.last %}{% else %},{% endif%}{% endfor %} ],
-             "owner": "/Common/failoverGroup/members/0",
-             "autoSync": false,
-             "saveOnAutoSync": false,
-             "networkFailover": true,
-             "fullLoadOnSync": false,
-             "asmSync": false
-         },
-         "trust": {
-             "class": "DeviceTrust",
-             "localUsername": "{{ username }}",
-             "localPassword": "{{ password }}",
-             "remoteHost": "/Common/failoverGroup/members/0",
-             "remoteUsername": "{{ username }}",
-             "remotePassword": "{{ password }}"
-         }
-
+        }
     }
 }
 

@@ -76,6 +76,7 @@ floating_self_ips:
     partition: "Common"
     address: "10.128.10.32"
     netmask: "255.255.255.0"
+    subnet: "24"
     vlan: "external"
     route_domain: 0
     traffic_group: "/Common/traffic-group-1"
@@ -83,6 +84,7 @@ floating_self_ips:
     partition: "Common"
     address: "10.10.10.32"
     netmask: "255.255.255.0"
+    subnet: "24"
     vlan: "internal"
     route_domain: 0
     traffic_group: "/Common/traffic-group-1"

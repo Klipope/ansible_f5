@@ -45,14 +45,14 @@
 
 - name: Add Declarativ Onboarding iAppLX package {{ DOrpm }}
   bigip_iapplx_package:
-    package: "../roles/DO/files/{{ DOrpm }}"
+    package: "{{ role_path }}/files/{{ DOrpm }}"
     provider: "{{ provider }}"
     state: present
   delegate_to: localhost
 
 - name: Add Application Service 3 iAppLX package {{ AS3rpm }}
   bigip_iapplx_package:
-    package: "../roles/DO/files/{{ AS3rpm }}"
+    package: "{{ role_path }}/files/{{ AS3rpm }}"
     provider: "{{ provider }}"
     state: present
   delegate_to: localhost
@@ -65,7 +65,7 @@
 
 - name: Debug jinja2
   debug:
-    msg: "Onboarding Declaration:\n{{ lookup('template', 'DOtemplateStandalone.j2') }}"
+    msg: "Onboarding Declaration:\n{{ lookup('template', 'DOtemplateStandalone.j2')| to_json }}"
 
 - name: "Declarative Deployment"
   uri:

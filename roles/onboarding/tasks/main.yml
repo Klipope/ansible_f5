@@ -71,7 +71,7 @@
 
 - name: Set NTP servers
   bigip_device_ntp:
-    ntp_servers: {{ npt_server_list }}
+    ntp_servers: "{{ ntp_server_list }}"
     provider: "{{ provider }}"
   delegate_to: localhost
 
