@@ -133,7 +133,7 @@
          "failoverGroup": {
              "class": "DeviceGroup",
              "type": "sync-failover",
-             "members": [ {% for host in ansible_play_hosts %}"{{ hostvars[host].hostname }}"{% if loop.last %}{% else %},{% endif%}{% endfor %} ],
+             "members": [ {% for host in ansible_play_hosts %}"{{ host }}"{% if loop.last %}{% else %},{% endif%}{% endfor %} ],
              "owner": "/Common/failoverGroup/members/0",
              "autoSync": false,
              "saveOnAutoSync": false,
